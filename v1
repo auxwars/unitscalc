@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dimensional Analysis Lab</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f5;
+  --bg-surface: #ffffff;
+  --bg-inset: #f3f0ec;
+  --bg-hover: #edeae5;
+  --border: #ddd8d0;
+  --border-strong: #c5bfb5;
+  --text: #1a1815;
+  --text-secondary: #5c574e;
+  --text-muted: #9a9489;
+  --accent: #b44a2d;
+  --accent-light: rgba(180, 74, 45, 0.08);
+  --accent-border: rgba(180, 74, 45, 0.25);
+  --ink: #2c2824;
+  --success: #2d7a4f;
+  --success-bg: rgba(45, 122, 79, 0.06);
+  --success-border: rgba(45, 122, 79, 0.2);
+  --fail: #a83232;
+  --fail-bg: rgba(168, 50, 50, 0.06);
+  --fail-border: rgba(168, 50, 50, 0.2);
+  --warn-bg: rgba(180, 140, 40, 0.06);
+  --warn-border: rgba(180, 140, 40, 0.25);
+  --warn: #8a6d1e;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(180,160,140,0.04) 27px, rgba(180,160,140,0.04) 28px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 40px 28px 80px; }
+
+.header { margin-bottom: 40px; padding-bottom: 24px; border-bottom: 2px solid var(--border); }
+.header h1 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; color: var(--ink); letter-spacing: -0.5px; }
+.header .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 6px; }
+
+.section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+/* MathQuill */
+.mq-editable-field {
+  border: 2px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 18px 22px !important;
+  min-height: 68px !important;
+  font-size: 22px !important;
+  background: var(--bg-surface) !important;
+  color: var(--ink) !important;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04) !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.mq-editable-field.mq-focused {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-light), inset 0 1px 3px rgba(0,0,0,0.04) !important;
+  outline: none !important;
+}
+.mq-editable-field .mq-cursor { border-color: var(--accent) !important; }
+.mq-editable-field var, .mq-editable-field .mq-text-mode {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: var(--bg-inset);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.toolbar-group {
+  display: flex;
+  gap: 2px;
+  padding-right: 8px;
+  margin-right: 5px;
+  border-right: 1px solid var(--border);
+}
+.toolbar-group:last-child { border-right: none; margin-right: 0; padding-right: 0; }
+
+.tb-btn {
+  width: 38px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 15px;
+  transition: all 0.1s;
+  position: relative;
+}
+.tb-btn:hover { background: var(--bg-hover); border-color: var(--border); color: var(--ink); }
+.tb-btn:active { transform: scale(0.94); }
+.tb-btn .katex { font-size: 0.95em; pointer-events: none; }
+.tb-btn[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Greek dropdown */
+.greek-dropdown { position: relative; display: inline-block; }
+.greek-trigger { width: auto; padding: 0 10px; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; }
+.greek-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 10px;
+  z-index: 200;
+  width: 280px;
+}
+.greek-panel.open { display: block; }
+.greek-panel-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 6px; margin-top: 8px; }
+.greek-panel-label:first-child { margin-top: 0; }
+.greek-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; }
+.greek-btn {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent; border-radius: 4px;
+  cursor: pointer; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: var(--text); transition: all 0.1s;
+}
+.greek-btn:hover { background: var(--accent-light); border-color: var(--accent-border); color: var(--accent); }
+
+/* Equation cards */
+.eq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.eq-card {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 12px 14px; background: var(--bg-inset); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s;
+}
+.eq-card:hover { border-color: var(--accent-border); background: var(--accent-light); transform: translateY(-1px); }
+.eq-card .eq-name { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+.eq-card .eq-formula .katex { font-size: 0.95em; }
+
+/* Variable assignment */
+.var-grid { display: grid; gap: 10px; }
+.var-row { display: grid; grid-template-columns: 70px 1fr; gap: 12px; align-items: center; animation: slideUp 0.2s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.var-badge {
+  text-align: center; padding: 8px; background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: 6px;
+  min-height: 38px; display: flex; align-items: center; justify-content: center;
+}
+.var-badge .katex { font-size: 1.05em; }
+.var-select {
+  width: 100%; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  font-family: 'Outfit', sans-serif; font-size: 13px; padding: 9px 32px 9px 12px; outline: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9489' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; cursor: pointer;
+}
+.var-select:focus { border-color: var(--accent); }
+.var-custom-input {
+  width: 100%; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 8px 12px; outline: none; margin-top: 6px;
+}
+.var-custom-input::placeholder { color: var(--text-muted); }
+.var-custom-input:focus { border-color: var(--accent); }
+
+/* Button */
+.analyze-btn {
+  width: 100%; padding: 15px; border: none; border-radius: var(--radius);
+  font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600;
+  cursor: pointer; background: var(--accent); color: #fff; margin-top: 12px; transition: all 0.15s;
+}
+.analyze-btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(180,74,45,0.2); }
+
+/* Results */
+.result-banner { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-radius: var(--radius); margin-bottom: 16px; font-weight: 600; font-size: 15px; }
+.result-banner.pass { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
+.result-banner.fail { background: var(--fail-bg); border: 1px solid var(--fail-border); color: var(--fail); }
+.result-banner.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+.result-banner .icon { font-size: 20px; }
+
+.breakdown-box { background: var(--bg-inset); border-radius: var(--radius); padding: 18px 20px; margin-top: 12px; border: 1px solid var(--border); }
+.breakdown-box h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; }
+.dim-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.dim-label-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); min-width: 40px; font-weight: 600; }
+.dim-value-tag { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text); padding: 5px 14px; background: var(--bg-surface); border-radius: 6px; border: 1px solid var(--border); }
+
+.detail-table { width: 100%; margin-top: 14px; border-collapse: collapse; }
+.detail-table th { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.detail-table td { font-size: 13px; padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.04); color: var(--text-secondary); }
+.detail-table td:first-child { color: var(--accent); }
+
+.info-hint {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); line-height: 1.7;
+  margin-top: 10px; padding: 10px 14px; background: var(--bg-inset); border-radius: 6px; border-left: 3px solid var(--border);
+}
+.info-hint code { background: var(--bg-hover); padding: 1px 5px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <h1>Dimensional Analysis Lab</h1>
+    <div class="subtitle">Visual equation editor with SI dimensional verification</div>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Equation Editor</div>
+    <div class="toolbar" id="toolbar"></div>
+    <div id="mathField" style="margin-bottom: 12px;"></div>
+    <div class="info-hint">
+      Click toolbar buttons or type naturally — <code>/</code> for fractions, <code>^</code> for exponents, <code>_</code> for subscripts. Greek letters auto-complete when you type their name.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Common Equations</div>
+    <div class="eq-grid" id="eqGrid"></div>
+  </div>
+
+  <div class="section" id="varSection" style="display:none">
+    <div class="section-label">Assign Dimensions</div>
+    <div class="var-grid" id="varGrid"></div>
+    <button class="analyze-btn" onclick="runAnalysis()">Run Dimensional Analysis</button>
+  </div>
+
+  <div class="section" id="resultSection" style="display:none">
+    <div class="section-label">Result</div>
+    <div id="resultContent"></div>
+  </div>
+</div>
+
+<script>
+const MQ = MathQuill.getInterface(2);
+let mathField;
+
+function initMathQuill() {
+  mathField = MQ.MathField(document.getElementById('mathField'), {
+    spaceBehavesLikeTab: false,
+    supSubsRequireOperand: false,
+    autoCommands: 'pi theta alpha beta gamma delta epsilon zeta eta lambda mu nu rho sigma tau phi psi omega Gamma Delta Omega Phi Psi Sigma nabla partial hbar ell sqrt vec hat dot ddot bar infty sum int prod',
+    autoOperatorNames: 'sin cos tan log ln exp lim',
+    handlers: { edit: function() { detectVariables(); } }
+  });
+}
+
+// Toolbar
+const toolbarDef = [
+  { group: 'struct', items: [
+    { tip:'Fraction', tex:'\\frac{a}{b}', act:()=>mathField.cmd('\\frac') },
+    { tip:'Square root', tex:'\\sqrt{x}', act:()=>mathField.cmd('\\sqrt') },
+    { tip:'Exponent', tex:'x^n', act:()=>mathField.cmd('^') },
+    { tip:'Subscript', tex:'x_i', act:()=>mathField.cmd('_') },
+    { tip:'Parentheses', tex:'(\\,)', act:()=>mathField.cmd('(') },
+  ]},
+  { group: 'ops', items: [
+    { tip:'Dot multiply', tex:'\\cdot', act:()=>mathField.write('\\cdot ') },
+    { tip:'Cross product', tex:'\\times', act:()=>mathField.write('\\times ') },
+    { tip:'Equals', tex:'=', act:()=>mathField.write('=') },
+    { tip:'Plus-minus', tex:'\\pm', act:()=>mathField.write('\\pm ') },
+  ]},
+  { group: 'calc', items: [
+    { tip:'Partial', tex:'\\partial', act:()=>mathField.write('\\partial ') },
+    { tip:'Nabla', tex:'\\nabla', act:()=>mathField.write('\\nabla ') },
+    { tip:'Integral', tex:'\\int', act:()=>mathField.cmd('\\int') },
+    { tip:'Sum', tex:'\\sum', act:()=>mathField.cmd('\\sum') },
+  ]},
+  { group: 'deco', items: [
+    { tip:'Vector', tex:'\\vec{v}', act:()=>mathField.cmd('\\vec') },
+    { tip:'Hat', tex:'\\hat{n}', act:()=>mathField.cmd('\\hat') },
+    { tip:'Time deriv', tex:'\\dot{x}', act:()=>mathField.cmd('\\dot') },
+    { tip:'Bar', tex:'\\bar{x}', act:()=>mathField.cmd('\\bar') },
+  ]},
+  { group: 'greek', isGreek: true },
+];
+
+const greekSets = {
+  lowercase: ['alpha','beta','gamma','delta','epsilon','zeta','eta','theta','lambda','mu','nu','pi','rho','sigma','tau','phi','psi','omega'],
+  uppercase: ['Gamma','Delta','Sigma','Phi','Psi','Omega'],
+  special: ['hbar','ell','infty','nabla','partial'],
+};
+
+function buildToolbar() {
+  const tb = document.getElementById('toolbar');
+  for (const g of toolbarDef) {
+    const gd = document.createElement('div');
+    gd.className = 'toolbar-group';
+    if (g.isGreek) {
+      const dd = document.createElement('div');
+      dd.className = 'greek-dropdown';
+      const trig = document.createElement('button');
+      trig.className = 'tb-btn greek-trigger';
+      trig.setAttribute('data-tip','Greek letters');
+      trig.textContent = '\u03B1\u03B2\u03B3';
+      trig.onclick = (e) => { e.stopPropagation(); dd.querySelector('.greek-panel').classList.toggle('open'); };
+      dd.appendChild(trig);
+
+      const panel = document.createElement('div');
+      panel.className = 'greek-panel';
+      for (const [label, letters] of [['Lowercase',greekSets.lowercase],['Uppercase',greekSets.uppercase],['Special',greekSets.special]]) {
+        const lbl = document.createElement('div'); lbl.className='greek-panel-label'; lbl.textContent=label; panel.appendChild(lbl);
+        const grid = document.createElement('div'); grid.className='greek-grid';
+        for (const gl of letters) {
+          const btn = document.createElement('button'); btn.className='greek-btn';
+          const sp = document.createElement('span');
+          try { katex.render('\\'+gl, sp, {throwOnError:false}); } catch { sp.textContent=gl; }
+          btn.appendChild(sp);
+          btn.onclick = (e) => { e.stopPropagation(); mathField.write('\\'+gl+' '); mathField.focus(); panel.classList.remove('open'); };
+          grid.appendChild(btn);
+        }
+        panel.appendChild(grid);
+      }
+      dd.appendChild(panel);
+      gd.appendChild(dd);
+    } else {
+      for (const item of g.items) {
+        const btn = document.createElement('button'); btn.className='tb-btn'; btn.setAttribute('data-tip', item.tip);
+        const sp = document.createElement('span');
+        try { katex.render(item.tex, sp, {throwOnError:false}); } catch { sp.textContent=item.tex; }
+        btn.appendChild(sp);
+        btn.onclick = () => { item.act(); mathField.focus(); };
+        gd.appendChild(btn);
+      }
+    }
+    tb.appendChild(gd);
+  }
+  document.addEventListener('click', () => { document.querySelectorAll('.greek-panel.open').forEach(p=>p.classList.remove('open')); });
+}
+
+// Known equations
+const knownEqs = [
+  { name:"Newton's 2nd Law", tex:"F=m\\cdot a", vars:{F:"force",m:"mass",a:"acceleration"} },
+  { name:"Kinetic Energy", tex:"E_k=\\frac{1}{2}mv^2", vars:{E_k:"energy",m:"mass",v:"velocity"} },
+  { name:"Gravitational PE", tex:"U=mgh", vars:{U:"energy",m:"mass",g:"acceleration",h:"length"} },
+  { name:"Coulomb's Law", tex:"F=k\\frac{q_1q_2}{r^2}", vars:{F:"force",k:"coulomb_const",q_1:"charge",q_2:"charge",r:"length"} },
+  { name:"Ideal Gas Law", tex:"PV=nRT", vars:{P:"pressure",V:"volume",n:"amount",R:"gas_const",T:"temperature"} },
+  { name:"E = mc\u00B2", tex:"E=mc^2", vars:{E:"energy",m:"mass",c:"velocity"} },
+  { name:"Wave Equation", tex:"v=f\\lambda", vars:{v:"velocity",f:"frequency","\\lambda":"length"} },
+  { name:"Ohm's Law", tex:"V=IR", vars:{V:"voltage",I:"current",R:"resistance"} },
+  { name:"Hooke's Law", tex:"F=-kx", vars:{F:"force",k:"spring_const",x:"length"} },
+  { name:"Pendulum Period", tex:"T=2\\pi\\sqrt{\\frac{l}{g}}", vars:{T:"time",l:"length",g:"acceleration"} },
+  { name:"Momentum", tex:"p=mv", vars:{p:"momentum",m:"mass",v:"velocity"} },
+  { name:"Schwarzschild Radius", tex:"r_s=\\frac{2GM}{c^2}", vars:{r_s:"length",G:"grav_const",M:"mass",c:"velocity"} },
+];
+
+let currentVarMap = {};
+
+function buildEqGrid() {
+  const grid = document.getElementById('eqGrid');
+  for (const eq of knownEqs) {
+    const card = document.createElement('div'); card.className='eq-card';
+    const nm = document.createElement('span'); nm.className='eq-name'; nm.textContent=eq.name;
+    const fm = document.createElement('span'); fm.className='eq-formula';
+    try { katex.render(eq.tex, fm, {throwOnError:false}); } catch { fm.textContent=eq.tex; }
+    card.appendChild(nm); card.appendChild(fm);
+    card.onclick = () => loadEq(eq);
+    grid.appendChild(card);
+  }
+}
+
+function loadEq(eq) {
+  mathField.latex(eq.tex);
+  currentVarMap = {...eq.vars};
+  detectVariables();
+  setTimeout(() => {
+    for (const v of detectedVars) {
+      const sel = document.getElementById('vs-'+sanitize(v));
+      if (sel && currentVarMap[v]) sel.value = currentVarMap[v];
+    }
+  }, 80);
+}
+
+// Dimension database
+const dimDB = {
+  dimensionless:{M:0,L:0,T:0,I:0,Θ:0,N:0,J:0,label:"Dimensionless"},
+  mass:{M:1,L:0,T:0,I:0,Θ:0,N:0,J:0,label:"Mass — kg"},
+  length:{M:0,L:1,T:0,I:0,Θ:0,N:0,J:0,label:"Length — m"},
+  time:{M:0,L:0,T:1,I:0,Θ:0,N:0,J:0,label:"Time — s"},
+  current:{M:0,L:0,T:0,I:1,Θ:0,N:0,J:0,label:"Current — A"},
+  temperature:{M:0,L:0,T:0,I:0,Θ:1,N:0,J:0,label:"Temperature — K"},
+  amount:{M:0,L:0,T:0,I:0,Θ:0,N:1,J:0,label:"Amount — mol"},
+  luminous:{M:0,L:0,T:0,I:0,Θ:0,N:0,J:1,label:"Luminous int. — cd"},
+  velocity:{M:0,L:1,T:-1,I:0,Θ:0,N:0,J:0,label:"Velocity — m/s"},
+  acceleration:{M:0,L:1,T:-2,I:0,Θ:0,N:0,J:0,label:"Acceleration — m/s\u00B2"},
+  force:{M:1,L:1,T:-2,I:0,Θ:0,N:0,J:0,label:"Force — N"},
+  energy:{M:1,L:2,T:-2,I:0,Θ:0,N:0,J:0,label:"Energy — J"},
+  power:{M:1,L:2,T:-3,I:0,Θ:0,N:0,J:0,label:"Power — W"},
+  pressure:{M:1,L:-1,T:-2,I:0,Θ:0,N:0,J:0,label:"Pressure — Pa"},
+  frequency:{M:0,L:0,T:-1,I:0,Θ:0,N:0,J:0,label:"Frequency — Hz"},
+  charge:{M:0,L:0,T:1,I:1,Θ:0,N:0,J:0,label:"Charge — C"},
+  voltage:{M:1,L:2,T:-3,I:-1,Θ:0,N:0,J:0,label:"Voltage — V"},
+  resistance:{M:1,L:2,T:-3,I:-2,Θ:0,N:0,J:0,label:"Resistance — \u03A9"},
+  capacitance:{M:-1,L:-2,T:4,I:2,Θ:0,N:0,J:0,label:"Capacitance — F"},
+  magnetic_flux:{M:1,L:2,T:-2,I:-1,Θ:0,N:0,J:0,label:"Mag. flux — Wb"},
+  magnetic_field:{M:1,L:0,T:-2,I:-1,Θ:0,N:0,J:0,label:"Mag. field — T"},
+  momentum:{M:1,L:1,T:-1,I:0,Θ:0,N:0,J:0,label:"Momentum — kg\u00B7m/s"},
+  angular_momentum:{M:1,L:2,T:-1,I:0,Θ:0,N:0,J:0,label:"Ang. momentum"},
+  torque:{M:1,L:2,T:-2,I:0,Θ:0,N:0,J:0,label:"Torque — N\u00B7m"},
+  area:{M:0,L:2,T:0,I:0,Θ:0,N:0,J:0,label:"Area — m\u00B2"},
+  volume:{M:0,L:3,T:0,I:0,Θ:0,N:0,J:0,label:"Volume — m\u00B3"},
+  density:{M:1,L:-3,T:0,I:0,Θ:0,N:0,J:0,label:"Density — kg/m\u00B3"},
+  spring_const:{M:1,L:0,T:-2,I:0,Θ:0,N:0,J:0,label:"Spring const — N/m"},
+  grav_const:{M:-1,L:3,T:-2,I:0,Θ:0,N:0,J:0,label:"Grav. const — G"},
+  coulomb_const:{M:1,L:3,T:-4,I:-2,Θ:0,N:0,J:0,label:"Coulomb const — k"},
+  gas_const:{M:1,L:2,T:-2,I:0,Θ:-1,N:-1,J:0,label:"Gas const — R"},
+  permittivity:{M:-1,L:-3,T:4,I:2,Θ:0,N:0,J:0,label:"Permittivity — \u03B5\u2080"},
+  permeability:{M:1,L:1,T:-2,I:-2,Θ:0,N:0,J:0,label:"Permeability — \u03BC\u2080"},
+  custom:{label:"Custom\u2026"},
+};
+
+// Variable detection
+let detectedVars = [];
+function sanitize(v) { return v.replace(/[^a-zA-Z0-9]/g, '_'); }
+
+function detectVariables() {
+  const tex = mathField.latex();
+  if (!tex.includes('=')) { document.getElementById('varSection').style.display='none'; return; }
+
+  const vars = new Set();
+  let c = tex;
+  const cmds = ['frac','sqrt','left','right','cdot','times','div','vec','hat','dot','ddot','bar','partial','nabla','sin','cos','tan','log','ln','exp','lim','sum','int','prod','text','mathrm','mathbf','boldsymbol','nthroot','operatorname'];
+  for (const cmd of cmds) c = c.replace(new RegExp('\\\\'+cmd+'(?![a-zA-Z])','g'),' ');
+
+  const gRe = /\\(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|lambda|mu|nu|pi|rho|sigma|tau|phi|psi|omega|Gamma|Delta|Omega|Phi|Psi|Sigma|hbar|ell)(?:_\{([^}]*)\}|_([a-zA-Z0-9]))?/g;
+  let m;
+  while ((m=gRe.exec(c))!==null) {
+    const sub=m[2]||m[3]||'';
+    vars.add('\\'+m[1]+(sub?(m[2]?'_{'+sub+'}':'_'+sub):''));
+  }
+
+  let c2 = c.replace(/\\(alpha|beta|gamma|delta|epsilon|zeta|eta|theta|lambda|mu|nu|pi|rho|sigma|tau|phi|psi|omega|Gamma|Delta|Omega|Phi|Psi|Sigma|hbar|ell)(?:_\{[^}]*\}|_[a-zA-Z0-9])?/g,' ');
+  const lRe = /([a-zA-Z])(?:_\{([^}]*)\}|_([a-zA-Z0-9]))?/g;
+  while ((m=lRe.exec(c2))!==null) {
+    const sub=m[2]||m[3]||'';
+    vars.add(m[1]+(sub?(m[2]?'_{'+sub+'}':'_'+sub):''));
+  }
+  vars.delete('d');
+
+  detectedVars = [...vars].sort();
+  if (!detectedVars.length) { document.getElementById('varSection').style.display='none'; return; }
+  renderVarGrid();
+  document.getElementById('varSection').style.display='';
+  document.getElementById('resultSection').style.display='none';
+}
+
+function renderVarGrid() {
+  const grid = document.getElementById('varGrid');
+  grid.innerHTML = '';
+  const keys = Object.keys(dimDB);
+  for (const v of detectedVars) {
+    const row = document.createElement('div'); row.className='var-row';
+    const badge = document.createElement('div'); badge.className='var-badge';
+    try { katex.render(v, badge, {throwOnError:false}); } catch { badge.textContent=v; }
+    row.appendChild(badge);
+
+    const col = document.createElement('div');
+    const sel = document.createElement('select'); sel.className='var-select'; sel.id='vs-'+sanitize(v);
+    for (const dk of keys) { const o=document.createElement('option'); o.value=dk; o.textContent=dimDB[dk].label; sel.appendChild(o); }
+    if (currentVarMap[v]) sel.value = currentVarMap[v];
+    const ci = document.createElement('input'); ci.className='var-custom-input'; ci.id='ci-'+sanitize(v); ci.placeholder='M:1 L:2 T:-2'; ci.style.display='none';
+    sel.onchange = () => { ci.style.display = sel.value==='custom' ? '' : 'none'; };
+    col.appendChild(sel); col.appendChild(ci);
+    row.appendChild(col);
+    grid.appendChild(row);
+  }
+}
+
+// Dimensional analysis engine
+function dimMul(a,b){return{M:a.M+b.M,L:a.L+b.L,T:a.T+b.T,I:a.I+b.I,Θ:a.Θ+b.Θ,N:a.N+b.N,J:a.J+b.J};}
+function dimDiv(a,b){return{M:a.M-b.M,L:a.L-b.L,T:a.T-b.T,I:a.I-b.I,Θ:a.Θ-b.Θ,N:a.N-b.N,J:a.J-b.J};}
+function dimPow(a,n){return{M:a.M*n,L:a.L*n,T:a.T*n,I:a.I*n,Θ:a.Θ*n,N:a.N*n,J:a.J*n};}
+function dimZero(){return{M:0,L:0,T:0,I:0,Θ:0,N:0,J:0};}
+function dimEq(a,b){return a.M===b.M&&a.L===b.L&&a.T===b.T&&a.I===b.I&&a.Θ===b.Θ&&a.N===b.N&&a.J===b.J;}
+function dimToTex(d){
+  const b=[{k:'M',s:'M'},{k:'L',s:'L'},{k:'T',s:'T'},{k:'I',s:'I'},{k:'Θ',s:'\\Theta'},{k:'N',s:'N'},{k:'J',s:'J'}];
+  let p=[];for(const x of b){const v=d[x.k];if(v===0)continue;p.push(v===1?x.s:x.s+'^{'+v+'}');}
+  return p.length?p.join('\\cdot '):'1\\;(\\text{dimensionless})';
+}
+
+function getVarDim(vn){
+  const sel=document.getElementById('vs-'+sanitize(vn)); if(!sel)return null;
+  if(sel.value==='custom'){const inp=document.getElementById('ci-'+sanitize(vn));if(!inp)return null;return parseCDim(inp.value);}
+  const d=dimDB[sel.value]; if(!d||sel.value==='custom')return null;
+  return{M:d.M,L:d.L,T:d.T,I:d.I,Θ:d.Θ,N:d.N,J:d.J};
+}
+function parseCDim(s){const d=dimZero();for(const p of s.trim().split(/\s+/)){const[k,v]=p.split(':');if(k&&v!==undefined&&d.hasOwnProperty(k))d[k]=parseFloat(v)||0;}return d;}
+
+function tokenize(tex){
+  let s=tex.replace(/\\left|\\right/g,'').replace(/\\cdot|\\times/g,'*').replace(/\\div/g,'/').replace(/\\[,;:!]/g,'');
+  const t=[];let i=0;
+  while(i<s.length){
+    if(/\s/.test(s[i])){i++;continue;}
+    if(/[0-9.]/.test(s[i])){let n='';while(i<s.length&&/[0-9.]/.test(s[i])){n+=s[i];i++;}t.push({type:'num',value:parseFloat(n)});continue;}
+    if(s[i]==='\\'){i++;let c='';while(i<s.length&&/[a-zA-Z]/.test(s[i])){c+=s[i];i++;}
+      if(c==='frac'){t.push({type:'frac'});continue;}
+      if(c==='sqrt'){t.push({type:'sqrt'});continue;}
+      if(c==='nthroot'){t.push({type:'nthroot'});continue;}
+      if(['vec','hat','dot','ddot','bar','boldsymbol','mathbf','mathrm','operatorname'].includes(c)){t.push({type:'pass'});continue;}
+      if(c==='pi'){t.push({type:'num',value:Math.PI});continue;}
+      t.push({type:'var',value:'\\'+c});continue;
+    }
+    const ch=s[i];
+    if('{}()[]^_*/+-='.includes(ch)){t.push({type:ch});i++;continue;}
+    if(/[a-zA-Z]/.test(ch)){t.push({type:'var',value:ch});i++;continue;}
+    i++;
+  }
+  return t;
+}
+
+class DimParser{
+  constructor(tok,gd){this.t=tok;this.p=0;this.gd=gd;this.vd={};}
+  pk(){return this.p<this.t.length?this.t[this.p]:null;}
+  adv(){return this.t[this.p++];}
+  exp(ty){const t=this.adv();if(!t||t.type!==ty)throw new Error('Expected '+ty);return t;}
+
+  parseExpr(){
+    let d=this.parseMul();
+    while(this.pk()&&(this.pk().type==='+'||this.pk().type==='-')){
+      this.adv();const r=this.parseMul();
+      if(!dimEq(d,r))throw new Error('Addition of incompatible dimensions: ['+dimToTex(d)+'] vs ['+dimToTex(r)+']');
+    }
+    return d;
+  }
+  parseMul(){
+    let d=this.parseUn();
+    while(this.pk()){
+      const t=this.pk();
+      if(t.type==='*'){this.adv();d=dimMul(d,this.parseUn());continue;}
+      if(t.type==='/'){this.adv();d=dimDiv(d,this.parseUn());continue;}
+      if(['var','num','(','frac','sqrt','nthroot','pass','{'].includes(t.type)){d=dimMul(d,this.parseUn());continue;}
+      break;
+    }
+    return d;
+  }
+  parseUn(){if(this.pk()&&this.pk().type==='-'){this.adv();return this.parsePow();}return this.parsePow();}
+  parsePow(){let b=this.parseAtom();if(this.pk()&&this.pk().type==='^'){this.adv();return dimPow(b,this.parseE());}return b;}
+  parseE(){
+    if(this.pk()&&this.pk().type==='{'){this.adv();const v=this.parseNE();this.exp('}');return v;}
+    if(this.pk()&&this.pk().type==='num')return this.adv().value;
+    if(this.pk()&&this.pk().type==='var'){this.adv();return 1;}
+    return 1;
+  }
+  parseNE(){
+    let v=this.parseNA();
+    while(this.pk()&&['+','-','*','/'].includes(this.pk().type)){
+      const op=this.adv().type;const r=this.parseNA();
+      if(op==='+')v+=r;else if(op==='-')v-=r;else if(op==='*')v*=r;else v/=r;
+    }
+    return v;
+  }
+  parseNA(){
+    if(this.pk()&&this.pk().type==='num')return this.adv().value;
+    if(this.pk()&&this.pk().type==='-'){this.adv();return -this.parseNA();}
+    if(this.pk()&&this.pk().type==='('){this.adv();const v=this.parseNE();this.exp(')');return v;}
+    if(this.pk()&&this.pk().type==='var'){this.adv();return 1;}
+    return 1;
+  }
+  parseAtom(){
+    const t=this.pk();if(!t)return dimZero();
+    if(t.type==='num'){this.adv();return dimZero();}
+    if(t.type==='frac'){this.adv();this.exp('{');const n=this.parseExpr();this.exp('}');this.exp('{');const d=this.parseExpr();this.exp('}');return dimDiv(n,d);}
+    if(t.type==='sqrt'){this.adv();this.exp('{');const inner=this.parseExpr();this.exp('}');return dimPow(inner,0.5);}
+    if(t.type==='nthroot'){this.adv();this.exp('[');const n=this.parseNE();this.exp(']');this.exp('{');const inner=this.parseExpr();this.exp('}');return dimPow(inner,1/n);}
+    if(t.type==='pass'){this.adv();if(this.pk()&&this.pk().type==='{'){this.adv();const inner=this.parseExpr();this.exp('}');return inner;}return dimZero();}
+    if(t.type==='('){this.adv();const inner=this.parseExpr();if(this.pk()&&this.pk().type===')')this.adv();return inner;}
+    if(t.type==='{'){this.adv();const inner=this.parseExpr();this.exp('}');return inner;}
+    if(t.type==='var'){
+      this.adv();let vn=t.value;
+      if(this.pk()&&this.pk().type==='_'){
+        this.adv();
+        if(this.pk()&&this.pk().type==='{'){
+          this.adv();let sub='';
+          while(this.pk()&&this.pk().type!=='}'){const s=this.adv();sub+=(s.value!==undefined?s.value:s.type);}
+          if(this.pk())this.adv();
+          vn+='_{'+sub+'}';
+        } else if(this.pk()&&(this.pk().type==='var'||this.pk().type==='num')){
+          const s=this.adv();vn+='_'+(s.value!==undefined?s.value:s.type);
+        }
+      }
+      if(vn==='d')return dimZero();
+      const dim=this.gd(vn);
+      if(!dim)throw new Error('No dimensions for: '+vn);
+      this.vd[vn]=dim;return dim;
+    }
+    this.adv();return dimZero();
+  }
+}
+
+function runAnalysis(){
+  const tex=mathField.latex();
+  const rs=document.getElementById('resultSection');
+  const rc=document.getElementById('resultContent');
+  rs.style.display='';
+
+  if(!tex.includes('=')){rc.innerHTML='<div class="result-banner warn"><span class="icon">\u26A0</span> Equation must contain = sign</div>';return;}
+  const sides=tex.split('=');
+  if(sides.length!==2){rc.innerHTML='<div class="result-banner warn"><span class="icon">\u26A0</span> Use exactly one = sign</div>';return;}
+
+  try{
+    const lp=new DimParser(tokenize(sides[0]),getVarDim);
+    const rp=new DimParser(tokenize(sides[1]),getVarDim);
+    const ld=lp.parseExpr(),rd=rp.parseExpr();
+    const match=dimEq(ld,rd);
+    const allV={...lp.vd,...rp.vd};
+    const ents=Object.entries(allV);
+
+    let h='';
+    h+=match?'<div class="result-banner pass"><span class="icon">\u2713</span> Dimensionally Consistent</div>'
+             :'<div class="result-banner fail"><span class="icon">\u2717</span> Dimensionally Inconsistent</div>';
+    h+=`<div class="breakdown-box"><h4>Dimensions</h4>
+      <div class="dim-row"><span class="dim-label-tag">LHS</span><span class="dim-value-tag" id="lhsR"></span></div>
+      <div class="dim-row"><span class="dim-label-tag">RHS</span><span class="dim-value-tag" id="rhsR"></span></div></div>`;
+    if(ents.length){
+      h+=`<div class="breakdown-box" style="margin-top:12px"><h4>Variables</h4><table class="detail-table"><thead><tr><th>Var</th><th>Dimensions</th></tr></thead><tbody>`;
+      for(let i=0;i<ents.length;i++) h+=`<tr><td><span id="vn${i}"></span></td><td><span id="vd${i}"></span></td></tr>`;
+      h+=`</tbody></table></div>`;
+    }
+    rc.innerHTML=h;
+    katex.render('[\\,'+dimToTex(ld)+'\\,]',document.getElementById('lhsR'),{throwOnError:false});
+    katex.render('[\\,'+dimToTex(rd)+'\\,]',document.getElementById('rhsR'),{throwOnError:false});
+    for(let i=0;i<ents.length;i++){
+      katex.render(ents[i][0],document.getElementById('vn'+i),{throwOnError:false});
+      katex.render(dimToTex(ents[i][1]),document.getElementById('vd'+i),{throwOnError:false});
+    }
+  } catch(err){
+    rc.innerHTML=`<div class="result-banner fail"><span class="icon">\u2717</span> ${err.message}</div>
+      <div class="info-hint" style="margin-top:12px">Ensure all variables have dimensions assigned and the equation is well-formed.</div>`;
+  }
+}
+
+// Boot
+initMathQuill();
+buildToolbar();
+buildEqGrid();
+</script>
+</body>
+</html>
